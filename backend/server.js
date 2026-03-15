@@ -1,24 +1,16 @@
 const express = require("express");
-const cors = require("cors");
+const path = require("path");
 
 const app = express();
+const PORT = 5000;
 
-app.use(cors());
-app.use(express.json());
+// serve dashboard files
+app.use(express.static(path.join(__dirname, "../.kiro/specs/dashboard")));
 
 app.get("/", (req, res) => {
-    res.send("Disaster Response AI Server Running");
+    res.sendFile(path.join(__dirname, "../.kiro/specs/dashboard/index.html"));
 });
 
-app.post("/report", async (req, res) => {
-    const { report } = req.body;
-
-    res.json({
-        message: "Report received",
-        report: report
-    });
-});
-
-app.listen(5000, () => {
-    console.log("Server running on port 5000");
+app.listen(PORT, () => {
+    console.log(`Server running at http://localhost:${PORT}`);
 });

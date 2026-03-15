@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<title>AI Infrastructure Monitoring System</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<style>
+
+body{
+background:#0f172a;
+font-family:Arial;
+color:white;
+margin:0;
+}
+
+h1{
+text-align:center;
+padding:20px;
+}
+
+.dashboard{
+padding:40px;
+}
+
+.card-container{
+display:flex;
+gap:20px;
+margin-bottom:30px;
+}
+
+.card{
+flex:1;
+background:#1e293b;
+padding:20px;
+border-radius:12px;
+position:relative;
+}
+
+.green{border-left:6px solid #22c55e;}
+.yellow{border-left:6px solid #facc15;}
+.red{border-left:6px solid #ef4444;}
+
+canvas{
+margin-top:10px;
+}
+
+.gauge-center{
+position:absolute;
+top:65%;
+left:50%;
+transform:translate(-50%,-50%);
+font-size:28px;
+font-weight:bold;
+}
+
+#map{
+height:350px;
+border-radius:10px;
+margin-top:10px;
+}
+
+.alert{
+background:#ef4444;
+padding:15px;
+text-align:center;
+font-weight:bold;
+display:none;
+}
+
+.explain{
+margin-top:30px;
+background:#1e293b;
+padding:20px;
+border-radius:12px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>AI Infrastructure Monitoring System</h1>
+
+<div id="alertBanner" class="alert">
+⚠ CRITICAL ALERT – Infrastructure Failure Risk High
+</div>
+
+<div class="dashboard">
+
+<div class="card-container">
+
+<div class="card">
+
+<h3>Infrastructure Health</h3>
+
+<canvas id="healthGauge"></canvas>
+
+<div id="healthValue" class="gauge-center">--%</div>
+
+</div>
+
+
+<div id="riskCard" class="card">
+
+<h3>Risk Status</h3>
+
+<p id="riskText">Waiting...</p>
+
+</div>
+
+
+<div class="card">
+
+<h3>Sensor Data</h3>
+
+<canvas id="sensorChart"></canvas>
+
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h3>Failure Prediction (Next Hours)</h3>
+
+<canvas id="predictionChart"></canvas>
+
+</div>
+
+
+<h3 style="margin-top:40px;">Infrastructure Location</h3>
+
+<div id="map"></div>
+
+
+<div class="explain">
+
+<h3>Sensor Value Explanation</h3>
+
+<p><b>Temperature:</b> Structural temperature of the infrastructure.  
+Higher values may indicate overheating or stress.</p>
+
+<p><b>Vibration:</b> Measures structural vibration.  
+High vibration may indicate cracks or structural weakness.</p>
+
+<p><b>Load:</b> Current weight or traffic load on the infrastructure.</p>
+
+<p><b>Health Score:</b> AI calculated structural integrity score.</p>
+
+<p><b>Risk Level:</b> Determined using AI based on sensor thresholds.</p>
+
+</div>
+
+</div>
+
+
+<script>
+
+let sensorChart;
+let gaugeChart;
+let predictionChart;
+
+let temperature=60;
+let vibration=20;
+let load=50;
+
+
+
+function createCharts(){
+
+sensorChart=new Chart(document.getElementById("sensorChart"),{
+
+type:"line",
+
+data:{
+labels:["Temperature","Vibration","Load"],
+datasets:[{
+label:"Sensor Values",
+data:[temperature,vibration,load],
+borderWidth:3,
+tension:0.4
+}]
+}
+
+});
+
+
+gaugeChart=new Chart(document.getElementById("healthGauge"),{
+
+type:"doughnut",
+
+data:{
+datasets:[{
+data:[70,30],
+backgroundColor:["#38bdf8","#ef4444"],
+borderWidth:0
+}]
+},
+
+options:{
+circumference:180,
+rotation:270,
+cutout:"75%",
+plugins:{legend:{display:false}}
+}
+
+});
+
+
+predictionChart=new Chart(document.getElementById("predictionChart"),{
+
+type:"line",
+
+data:{
+labels:["1h","2h","3h","4h","5h","6h"],
+datasets:[{
+label:"Failure Probability %",
+data:[10,15,20,30,35,40],
+borderWidth:3,
+tension:0.4
+}]
+}
+
+});
+
+}
+
+
+
+function updateDashboard(){
+
+temperature+=Math.random()*4-2;
+vibration+=Math.random()*2-1;
+load+=Math.random()*3-1.5;
+
+temperature=Math.max(40,Math.min(90,temperature));
+vibration=Math.max(10,Math.min(50,vibration));
+load=Math.max(20,Math.min(90,load));
+
+
+sensorChart.data.datasets[0].data=[
+
+temperature.toFixed(1),
+vibration.toFixed(1),
+load.toFixed(1)
+
+];
+
+sensorChart.update();
+
+
+let health=100-(temperature*0.3+vibration*0.8+load*0.2);
+
+health=Math.max(10,Math.min(100,health));
+
+
+gaugeChart.data.datasets[0].data=[health,100-health];
+gaugeChart.update();
+
+document.getElementById("healthValue").innerText=Math.round(health)+"%";
+
+
+let risk="LOW";
+
+if(health<70) risk="MEDIUM";
+if(health<40) risk="HIGH";
+
+
+const riskCard=document.getElementById("riskCard");
+riskCard.classList.remove("green","yellow","red");
+
+if(risk==="LOW"){
+
+riskCard.classList.add("green");
+document.getElementById("riskText").innerText="Low Risk";
+
+}
+
+if(risk==="MEDIUM"){
+
+riskCard.classList.add("yellow");
+document.getElementById("riskText").innerText="Medium Risk";
+
+}
+
+if(risk==="HIGH"){
+
+riskCard.classList.add("red");
+document.getElementById("riskText").innerText="High Risk";
+document.getElementById("alertBanner").style.display="block";
+
+}
+
+}
+
+
+
+function initMap(){
+
+const map=L.map("map").setView([13.0827,80.2707],10);
+
+L.tileLayer(
+
+"https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+
+{maxZoom:19}
+
+).addTo(map);
+
+
+L.marker([13.0827,80.2707])
+
+.addTo(map)
+
+.bindPopup("Bridge Monitoring Location")
+
+.openPopup();
+
+}
+
+
+createCharts();
+
+initMap();
+
+updateDashboard();
+
+setInterval(updateDashboard,4000);
+
+</script>
+
+</body>
+</html>
