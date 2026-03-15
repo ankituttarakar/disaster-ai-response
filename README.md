@@ -70,24 +70,23 @@ Components:
 ## Dashboard Interface
 
 ### Infrastructure Monitoring Dashboard
-![Dashboard](screenshots/dash1.jpeg)
+![Dashboard](.kiro/spec/screenshots/dash1.jpeg)
 
 ### Sensor Data Visualization
-![Dashboard](screenshots/dash2.jpeg)
+![Dashboard](.kiro/spec/screenshots/dash2.jpeg)
 
 ---
 
 ## AWS Cloud Implementation
 
 ### DynamoDB Table (Infrastructure Health Logs)
-![DynamoDB](screenshots/dynamo.jpeg)
+![DynamoDB](.kiro/spec/screenshots/dynamo.jpeg)
 
 ### API Gateway Endpoint
-![API Gateway](screenshots/gateway.jpeg)
+![API Gateway](.kiro/spec/screenshots/gateway.jpeg)
 
 ### Lambda Function Backend
-![Lambda](screenshots/lambda.jpeg)
-
+![Lambda](.kiro/spec/screenshots/lambda.jpeg)
 ---
 
 ## Risk Calculation Logic
