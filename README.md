@@ -87,7 +87,6 @@ Components:
 
 ### Lambda Function Backend
 ![Lambda](screenshots/lambda.jpeg)
-
 ---
 
 ## Risk Calculation Logic
